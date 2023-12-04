@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 
-void lexicalAnalyzer(std::string input) {
+void lexicalAnalyzer(std::string input, std::vector<std::pair<std::string, std::string>>& vec) {
     std::regex identifiers("^[a-zA-Z_][a-zA-Z0-9_]*$");
     std::regex numbers("^[0-9]+$");
     std::regex operators("^[+*/=-]$");
@@ -15,22 +15,22 @@ void lexicalAnalyzer(std::string input) {
 
     while (stringstream >> token) {
         if (std::regex_match(token, reserved_words)) {
-            std::cout << token << " -> зарезервированное слово" << std::endl;
+            vec.push_back(std::make_pair(token, "reserved_word"));
         }
         else if (std::regex_match(token, characters)) {
-            std::cout << token << " -> вспомогательный символ" << std::endl;
+            vec.push_back(std::make_pair(token, "character"));
         }
         else if (std::regex_match(token, identifiers)) {
-            std::cout << token << " -> идентификатор" << std::endl;
+            vec.push_back(std::make_pair(token, "identifier"));
         }
         else if (std::regex_match(token, numbers)) {
-            std::cout << token << " -> число" << std::endl;
+            vec.push_back(std::make_pair(token, "number"));
         }
         else if (std::regex_match(token, operators)) {
-            std::cout << token << " -> оператор" << std::endl;
+            vec.push_back(std::make_pair(token, "operator"));
         }
         else {
-            std::cout << token << " -> ошибка" << std::endl;
+            vec.push_back(std::make_pair(token, "unknown_character"));
             return;
         }
     }
@@ -38,7 +38,10 @@ void lexicalAnalyzer(std::string input) {
 
 int main() {
     setlocale(LC_ALL, "");
+    std::vector<std::pair<std::string, std::string>> lexems;
     std::string input = "loop do { x = 10 + 25 ; } y = x * 30 ;";
-    lexicalAnalyzer(input);
+    lexicalAnalyzer(input, lexems);
+    for (int i = 0; i < lexems.size(); ++i)
+        std::cout << lexems[i].first << " -> " << lexems[i].second << std::endl;
     return 0;
 }
