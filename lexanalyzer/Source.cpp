@@ -264,7 +264,7 @@ public:
 };
 
 
-
+//g++ -x c++ file.txt -o progname
 int main() {
     setlocale(LC_ALL, "");
     std::vector<std::pair<std::string, std::string>> lexems;
