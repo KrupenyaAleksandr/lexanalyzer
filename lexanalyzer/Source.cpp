@@ -7,6 +7,7 @@
 #include <utility>
 #include <format>
 #include <fstream>
+#include <Windows.h>
 
 void lexicalAnalyzer(std::string input, std::vector<std::pair<std::string, std::string>>& vec) {
     std::regex identifiers("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -83,8 +84,8 @@ public:
         }
     }
     void buildParseTree() {
-        // перемещаем приравние в конец чтобы в итоге оно получилось в корне
         for (int i = 0; i < tokens.size(); ++i) {
+
             if (tokens[i][0].second == "cycle") {
                 roots.push_back(new Node(tokens[i][0].first));
                 continue;
@@ -95,6 +96,7 @@ public:
                 tokens[i].erase(tokens[i].begin());
                 tokens[i].erase(tokens[i].begin());
             }
+
             std::vector<std::pair<std::string, std::string>> vec;
             vec = tokens[i];
             int node_num = 1;
@@ -217,6 +219,7 @@ public:
             generateCodeRecursive(roots[i], output);
             output += ";\n";
         }
+        output += "system(\"pause\");\n";
         output += "}";
         std::ofstream out("output.txt");
         out << output;
@@ -264,34 +267,35 @@ public:
 };
 
 
-//g++ -x c++ file.txt -o progname
 int main() {
     setlocale(LC_ALL, "");
     std::vector<std::pair<std::string, std::string>> lexems;
+
+    //std::string input =
+    //    R"(
+    //    a = 10 + 23 - 3 ;
+    //    loop do
+    //    {
+    //        x = 10 - 25 * 5 + 35 / 5 * 2 + 12 ; 
+    //        y = x * 30 ;
+    //    }
+    //    )";
+
     std::string input =
         R"(
         a = 10 + 23 - 3 ;
-        loop do
-        {
-            x = 10 - 25 * 5 + 35 / 5 * 2 + 12 ; 
-            y = x * 30 ;
-        }
+        c = 20 + 3 ;
+        x = 10 - 25 * 5 + 35 / 5 * 2 + 12 ; 
         )";
-    lexicalAnalyzer(input, lexems);
 
-    /*
-    * double a, x, y;
-    * a = 10 + 23 - 3;
-    * while (true)
-    * {
-    *  x = 10 - 25 * 5 + 35 / 5 * 2 + 12;
-    *  y = x * 30;
-    * }
-    */
+    lexicalAnalyzer(input, lexems);
 
     SyntaxParser syntaxParser(lexems);
     syntaxParser.buildParseTree();
     syntaxParser.printTree();
     syntaxParser.generateCode();
+
+    system("g++ -x c++ ./output.txt -o ./program");
+
     return 0;
 }
